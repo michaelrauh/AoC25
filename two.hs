@@ -32,16 +32,19 @@ divisibleLengths n = [d | d <- [1..(len `div` 2)], len `mod` d == 0]
 isRepeating :: String -> Integer -> Bool
 isRepeating s len = all (== take (fromIntegral len) s) (chunksOf (fromIntegral len) s)
 
+hasRepeatingCycle :: String -> [Integer] -> Bool
+hasRepeatingCycle s = any (isRepeating s)
+
 isInvalidPartOne :: ID -> Bool
 isInvalidPartOne (ID n) =
-  even len && take halfLen s == drop halfLen s
+  even len && hasRepeatingCycle s [fromIntegral halfLen]
   where
     s = show n
     len = length s
     halfLen = len `div` 2
 
 isInvalidPartTwo :: ID -> Bool
-isInvalidPartTwo (ID n) = any (isRepeating s) (divisibleLengths s)
+isInvalidPartTwo (ID n) = hasRepeatingCycle s (divisibleLengths s)
   where
     s = show n
 
