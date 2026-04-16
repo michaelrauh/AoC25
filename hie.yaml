@@ -1,0 +1,6 @@
+cradle:
+  cabal:
+    - path: "./two.hs"
+      component: "exe:two"
+    - path: "./one.hs"
+      component: "exe:one"
