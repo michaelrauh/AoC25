@@ -18,11 +18,10 @@ findIDsInRange (Range start end) = map ID [start .. end]
 findAllIds :: [Range] -> [ID]
 findAllIds = concatMap findIDsInRange
 
-idToSum :: ID -> Sum Integer
-idToSum (ID n) = Sum n
-
 sumIDs :: [ID] -> Integer
-sumIDs = getSum . foldMap idToSum
+sumIDs = getSum . foldMap toSum
+  where
+    toSum (ID n) = Sum n
 
 divisibleLengths :: String -> [Integer]
 divisibleLengths n = [d | d <- [1..(len `div` 2)], len `mod` d == 0]
@@ -35,35 +34,38 @@ isRepeating s len = all (== take (fromIntegral len) s) (chunksOf (fromIntegral l
 hasRepeatingCycle :: String -> [Integer] -> Bool
 hasRepeatingCycle s = any (isRepeating s)
 
-isInvalidPartOne :: ID -> Bool
-isInvalidPartOne (ID n) =
-  even len && hasRepeatingCycle s [fromIntegral halfLen]
+isInvalidWith :: (String -> [Integer]) -> ID -> Bool
+isInvalidWith cycleLengths (ID n) = hasRepeatingCycle s (cycleLengths s)
   where
     s = show n
+
+partOneCycleLengths :: String -> [Integer]
+partOneCycleLengths s
+  | even len = [fromIntegral (len `div` 2)]
+  | otherwise = []
+  where
     len = length s
-    halfLen = len `div` 2
+
+isInvalidPartOne :: ID -> Bool
+isInvalidPartOne = isInvalidWith partOneCycleLengths
 
 isInvalidPartTwo :: ID -> Bool
-isInvalidPartTwo (ID n) = hasRepeatingCycle s (divisibleLengths s)
-  where
-    s = show n
+isInvalidPartTwo = isInvalidWith divisibleLengths
 
-findInvalidIdsPartOne :: [Range] -> [ID]
-findInvalidIdsPartOne = filter isInvalidPartOne . findAllIds
+findInvalidIds :: (ID -> Bool) -> [Range] -> [ID]
+findInvalidIds isInvalid = filter isInvalid . findAllIds
 
-findInvalidIdsPartTwo :: [Range] -> [ID]
-findInvalidIdsPartTwo = filter isInvalidPartTwo . findAllIds
+processOne :: [Range] -> Integer
+processOne = sumIDs . findInvalidIds isInvalidPartOne
+
+processTwo :: [Range] -> Integer
+processTwo = sumIDs . findInvalidIds isInvalidPartTwo
 
 process :: String -> IO ()
 process input = do
-  putStrLn $ "Part 1: " ++ show (processOne input)
-  putStrLn $ "Part 2: " ++ show (processTwo input)
-
-processOne :: String -> Integer
-processOne = sumIDs . findInvalidIdsPartOne . parseAll
-
-processTwo :: String -> Integer
-processTwo = sumIDs . findInvalidIdsPartTwo . parseAll
+  let ranges = parseAll input
+  putStrLn $ "Part 1: " ++ show (processOne ranges)
+  putStrLn $ "Part 2: " ++ show (processTwo ranges)
 
 main = do
   s <- readFile "inputs/2.txt"
