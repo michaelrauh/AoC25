@@ -1,5 +1,5 @@
 import Data.Monoid (Sum(..))
-import Data.List.Split (splitOn)
+import Data.List.Split (splitOn, chunksOf)
 
 data Range = Range Integer Integer
 newtype ID = ID Integer
@@ -24,20 +24,43 @@ idToSum (ID n) = Sum n
 sumIDs :: [ID] -> Integer
 sumIDs = getSum . foldMap idToSum
 
-isInvalid :: ID -> Bool
-isInvalid (ID n) = uncurry (==) $ splitAt (length s `div` 2) s
+divisibleLengths :: String -> [Integer]
+divisibleLengths n = [d | d <- [1..(len `div` 2)], len `mod` d == 0]
+  where
+    len = fromIntegral $ length n
+
+isRepeating :: String -> Integer -> Bool
+isRepeating s len = all (== take (fromIntegral len) s) (chunksOf (fromIntegral len) s)
+
+isInvalidPartOne :: ID -> Bool
+isInvalidPartOne (ID n) =
+  even len && take halfLen s == drop halfLen s
+  where
+    s = show n
+    len = length s
+    halfLen = len `div` 2
+
+isInvalidPartTwo :: ID -> Bool
+isInvalidPartTwo (ID n) = any (isRepeating s) (divisibleLengths s)
   where
     s = show n
 
-findInvalidIds :: [Range] -> [ID]
-findInvalidIds = filter isInvalid . findAllIds
+findInvalidIdsPartOne :: [Range] -> [ID]
+findInvalidIdsPartOne = filter isInvalidPartOne . findAllIds
+
+findInvalidIdsPartTwo :: [Range] -> [ID]
+findInvalidIdsPartTwo = filter isInvalidPartTwo . findAllIds
 
 process :: String -> IO ()
 process input = do
   putStrLn $ "Part 1: " ++ show (processOne input)
+  putStrLn $ "Part 2: " ++ show (processTwo input)
 
 processOne :: String -> Integer
-processOne = sumIDs . findInvalidIds . parseAll
+processOne = sumIDs . findInvalidIdsPartOne . parseAll
+
+processTwo :: String -> Integer
+processTwo = sumIDs . findInvalidIdsPartTwo . parseAll
 
 main = do
   s <- readFile "inputs/2.txt"
