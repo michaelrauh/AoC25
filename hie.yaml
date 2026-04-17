@@ -4,3 +4,5 @@ cradle:
       component: "exe:two"
     - path: "./one.hs"
       component: "exe:one"
+    - path: "./three.hs"
+      component: "exe:three"

@@ -17,3 +17,10 @@ executable two
       base >=4.12 && <5,
       split
   default-language: Haskell2010
+
+executable three
+  main-is: three.hs
+  hs-source-dirs: .
+  build-depends:
+      base >=4.12 && <5
+  default-language: Haskell2010
