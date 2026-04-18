@@ -19,22 +19,17 @@ parse = Bank . map (Battery . digitToInt)
 parseAll :: String -> [Bank]
 parseAll = map parse . lines
 
-processOne :: [Bank] -> Int
-processOne = sum . map findMaxJoltage
-
-findMaxJoltage :: Bank -> Int
-findMaxJoltage = listToJoltage . findMaxWithRoom 2 . unBank
+processN :: Int -> [Bank] -> Int
+processN n = sum . map (listToJoltage . findMaxWithRoom n . unBank)
 
 listToJoltage :: [Battery] -> Int
 listToJoltage = foldl (\acc (Battery d) -> acc * 10 + d) 0
 
-pairToJoltage :: (Battery, Battery) -> Int
-pairToJoltage (Battery a, Battery b) = 10 * a + b
-
 process :: String -> IO ()
 process input = do
     let banks = parseAll input
-    putStrLn $ "Part 1: " ++ show (processOne banks)
+    putStrLn $ "Part 1: " ++ show (processN 2 banks)
+    putStrLn $ "Part 2: " ++ show (processN 12 banks)
 
 main :: IO ()
 main = do
