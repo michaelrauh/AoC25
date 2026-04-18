@@ -1,18 +1,17 @@
-{-# LANGUAGE TupleSections #-}
 import Data.Char (digitToInt)
 import Data.List (tails)
-newtype Battery = Battery Int
+newtype Battery = Battery Int deriving (Eq, Ord)
 newtype Bank = Bank [Battery]
 
 unBank :: Bank -> [Battery]
 unBank (Bank bs) = bs
 
-
--- example input
--- 987654321111111
--- 811111111111119
--- 234234234234278
--- 818181911112111
+findMaxWithRoom :: (Ord a, Eq a) => Int -> [a] -> [a]
+findMaxWithRoom 1 l = [maximum l]
+findMaxWithRoom room l =
+    let largestIntWithRoom = maximum $ take (length l - room + 1) l
+        remainingSearchSpace = tail $ dropWhile (/= largestIntWithRoom) l
+    in largestIntWithRoom : findMaxWithRoom (room - 1) remainingSearchSpace
 
 parse :: String -> Bank
 parse = Bank . map (Battery . digitToInt)
@@ -23,14 +22,11 @@ parseAll = map parse . lines
 processOne :: [Bank] -> Int
 processOne = sum . map findMaxJoltage
 
-pairs :: [a] -> [(a, a)]
-pairs =
-  concatMap (\(x:xs) -> map (x,) xs)
-  . filter (not . null)
-  . tails
-
 findMaxJoltage :: Bank -> Int
-findMaxJoltage = maximum . map pairToJoltage . pairs . unBank
+findMaxJoltage = listToJoltage . findMaxWithRoom 2 . unBank
+
+listToJoltage :: [Battery] -> Int
+listToJoltage = foldl (\acc (Battery d) -> acc * 10 + d) 0
 
 pairToJoltage :: (Battery, Battery) -> Int
 pairToJoltage (Battery a, Battery b) = 10 * a + b
