@@ -41,3 +41,11 @@ executable five
       containers,
       base >=4.12 && <5
   default-language: Haskell2010
+
+executable six
+  main-is: six.hs
+  hs-source-dirs: .
+  build-depends:
+      containers,
+      base >=4.12 && <5
+  default-language: Haskell2010
