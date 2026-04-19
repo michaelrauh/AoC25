@@ -24,3 +24,12 @@ executable three
   build-depends:
       base >=4.12 && <5
   default-language: Haskell2010
+
+
+executable four
+  main-is: four.hs
+  hs-source-dirs: .
+  build-depends:
+      containers,
+      base >=4.12 && <5
+  default-language: Haskell2010
