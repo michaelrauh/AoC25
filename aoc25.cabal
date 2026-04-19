@@ -33,3 +33,11 @@ executable four
       containers,
       base >=4.12 && <5
   default-language: Haskell2010
+
+executable five
+  main-is: five.hs
+  hs-source-dirs: .
+  build-depends:
+      containers,
+      base >=4.12 && <5
+  default-language: Haskell2010
